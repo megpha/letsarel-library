@@ -3,3 +3,69 @@
 
 == Getting Started
   rake db:reset
+
+
+
+
+Scope Extensions
+==============
+  author = Author.first
+
+
+merge association proxies
+-------------------------
+  look the author#publishers 
+
+  Publisher.joins(books: { collaborations: :author }).merge(author.collaborations.scoped)
+
+  but if you remove scoped it wont work
+
+  Publisher.joins(books: { collaborations: :author }).merge(author.collaborations)
+
+except
+------
+  look the author#publishers_worked_as_editor
+
+  after the merge with as_writer
+
+  author.publishers.merge(Author.as_writer).joins_values
+
+  [{:books=>{:collaborations=>:author}}, :collaborations]
+
+  but Publisher can not join on :collaborations
+
+  this is due to merge of as_writer scope
+
+  execute the above scope
+
+    author.publishers.merge(Author.as_writer).to_a
+
+  error
+  -----
+
+  ActiveRecord::ConfigurationError: Association named 'collaborations' was not found; perhaps you misspelled it?
+  
+
+  so to remove that join before the merge you need to do
+
+  author.publishers.merge(Author.as_writer.except(:joins)).joins_values
+
+  [{:books=>{:collaborations=>:author}}]
+
+
+except
+------
+ it is complimentary to above method
+  author.publishers.merge(Author.as_writer.only(:wheres))
+
+uniq on scope vs association proxy
+--------------------------------------
+  author.books.uniq
+
+  SELECT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
+
+  author.books.scoped.uniq
+
+  SELECT DISTINCT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
+
+  scope add distinct to query
