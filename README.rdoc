@@ -7,13 +7,11 @@
 
 
 
-Scope Extensions
-==============
+== Scope Extensions
   author = Author.first
 
 
-merge association proxies
--------------------------
+=== merge association proxies
   look the author#publishers 
 
   Publisher.joins(books: { collaborations: :author }).merge(author.collaborations.scoped)
@@ -22,8 +20,8 @@ merge association proxies
 
   Publisher.joins(books: { collaborations: :author }).merge(author.collaborations)
 
-except
-------
+=== except
+
   look the author#publishers_worked_as_editor
 
   after the merge with as_writer
@@ -53,13 +51,11 @@ except
   [{:books=>{:collaborations=>:author}}]
 
 
-except
-------
+==== except
  it is complimentary to above method
   author.publishers.merge(Author.as_writer.only(:wheres))
 
-uniq on scope vs association proxy
---------------------------------------
+==== uniq on scope vs association proxy
   author.books.uniq
 
   SELECT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
