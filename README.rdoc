@@ -1,4 +1,4 @@
-![Alt text](/ERD.png)
+![Alt schema](https://github.com/megpha/letsarel/blob/master/ERD.png)
 
 == Welcome to Letsarel
   This is example project used to demonstrate active record arel capabilities
