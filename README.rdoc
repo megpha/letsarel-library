@@ -24,19 +24,19 @@
 
   look the author#publishers_worked_as_editor
 
-  after the merge with as_writer
+  after the merge with writer
 
-  author.publishers.merge(Author.as_writer).joins_values
+  author.publishers.merge(Author.writer).joins_values
 
   [{:books=>{:collaborations=>:author}}, :collaborations]
 
   but Publisher can not join on :collaborations
 
-  this is due to merge of as_writer scope
+  this is due to merge of writer scope
 
   execute the above scope
 
-    author.publishers.merge(Author.as_writer).to_a
+    author.publishers.merge(Author.writer).to_a
 
   error
   -----
@@ -46,14 +46,14 @@
 
   so to remove that join before the merge you need to do
 
-  author.publishers.merge(Author.as_writer.except(:joins)).joins_values
+  author.publishers.merge(Author.writer.except(:joins)).joins_values
 
   [{:books=>{:collaborations=>:author}}]
 
 
 ==== except
  it is complimentary to above method
-  author.publishers.merge(Author.as_writer.only(:wheres))
+  author.publishers.merge(Author.writer.only(:wheres))
 
 ==== uniq on scope vs association proxy
   author.books.uniq
@@ -75,13 +75,13 @@
 
   Publisher.joins(books: { collaborations: :author }).merge(Collaboration.editor)
 
-  Publisher.joins(books: { collaborations: :author }).merge(Author.as_editor.except(:joins))
+  Publisher.joins(books: { collaborations: :author }).merge(Author.editor.except(:joins))
 
 ======= you can chain the merge
   
   Publisher.
     joins(books: { collaborations: :author }).
-    merge(Author.as_editor.except(:joins))
+    merge(Author.editor.except(:joins))
     merge(Book.thriller)
 
 === includes/joins
@@ -99,3 +99,8 @@
 
   SELECT "publishers".* FROM "publishers" INNER JOIN "books" ON "books"."publisher_id" = "publishers"."id" INNER JOIN "collaborations" ON "collaborations"."book_id" = "books"."id" INNER JOIN "authors" ON "authors"."id" = "collaborations"."author_id" WHERE "collaborations"."role" = 'editor'
 
+=== subquery
+
+  Author.non_thriller_writers
+
+  SELECT "authors".* FROM "authors" WHERE ("authors"."id" NOT IN (SELECT "authors"."id" FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller'))

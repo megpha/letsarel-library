@@ -1,10 +1,29 @@
 class Author < ActiveRecord::Base
   attr_accessible :first_name, :last_name
+
   has_many :collaborations
   has_many :books, through: :collaborations
 
-  scope :as_editor, lambda { joins(:collaborations).merge(Collaboration.editor) }
-  scope :as_writer, lambda { joins(:collaborations).merge(Collaboration.writer) }
+  scope :editor, lambda { joins(:collaborations).merge(Collaboration.editor) }
+  scope :writer, lambda { joins(:collaborations).merge(Collaboration.writer) }
+
+  scope :thriller_writers, lambda { joins(collaborations: :book).merge(Book.thriller) }
+
+  # or query
+  def self.by_name(name)
+    name = "%#{ name }%"
+    predicate = arel_table[:first_name].matches(name).or(arel_table[:last_name].matches(name))
+
+    where(predicate)
+  end
+
+  # subquery
+  def self.non_thriller_writers
+    idattr = arel_table[:id]
+    subquery = thriller_writers.select(idattr)
+
+    where(idattr.not_in(subquery.arel.ast))
+  end
 
   # merge association
   # this wont work if you removed scoped from the association
@@ -14,19 +33,19 @@ class Author < ActiveRecord::Base
 
   # usage except method on scope
   def publishers_worked_as_editor 
-    publishers.merge(Author.as_editor.except(:joins))
+    publishers.merge(Author.editor.except(:joins))
   end
 
   def books_worked_as_editor
-    books.merge(Author.as_editor.except(:joins))
+    books.merge(Author.editor.except(:joins))
   end
 
   # usage except method on only
   def publishers_worked_as_writer
-    publishers.merge(Author.as_writer.only(:wheres))
+    publishers.merge(Author.writer.only(:wheres))
   end
 
   def books_worked_as_writer
-    books.merge(Author.as_writer.only(:wheres))
+    books.merge(Author.writer.only(:wheres))
   end
 end
