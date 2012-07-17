@@ -7,7 +7,7 @@ class Author < ActiveRecord::Base
   scope :editor, lambda { joins(:collaborations).merge(Collaboration.editor) }
   scope :writer, lambda { joins(:collaborations).merge(Collaboration.writer) }
 
-  scope :thriller_writers, lambda { joins(collaborations: :book).merge(Book.thriller) }
+  scope :thrillers, lambda { joins(collaborations: :book).merge(Book.thriller) }
 
   # or query
   def self.by_name(name)
@@ -18,9 +18,9 @@ class Author < ActiveRecord::Base
   end
 
   # subquery
-  def self.non_thriller_writers
+  def self.non_thrillers
     idattr = arel_table[:id]
-    subquery = thriller_writers.select(idattr)
+    subquery = thrillers.select(idattr)
 
     where(idattr.not_in(subquery.arel.ast))
   end
