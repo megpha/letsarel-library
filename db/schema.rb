@@ -21,13 +21,14 @@ ActiveRecord::Schema.define(:version => 20120716185556) do
   end
 
   create_table "books", :force => true do |t|
-    t.string   "title",                           :null => false
-    t.string   "language",                        :null => false
-    t.string   "genre",                           :null => false
-    t.integer  "publisher_id",                    :null => false
-    t.boolean  "published",    :default => false, :null => false
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.string   "title",                                :null => false
+    t.string   "language",                             :null => false
+    t.string   "genre",                                :null => false
+    t.integer  "publisher_id",                         :null => false
+    t.boolean  "published",         :default => false, :null => false
+    t.float    "sales_in_millions"
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
   end
 
   add_index "books", ["publisher_id"], :name => "index_books_on_publisher_id"

@@ -6,6 +6,7 @@ class CreateBooks < ActiveRecord::Migration
       t.string :genre, null: false
       t.references :publisher, null: false
       t.boolean :published, null: false, default: false
+      t.float :sales_in_millions
 
       t.timestamps
     end

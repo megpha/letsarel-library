@@ -11,9 +11,12 @@ musso = Author.create(first_name: 'Guillaume', last_name: 'Musso')
 wynwood = Publisher.create(name: 'Wynwood Press')
 penguin = Publisher.create(name: 'Penguin Press')
 
-timetokill = wynwood.books.create(title: 'A Time To Kill', genre: 'thriller', language: 'english') 
+timetokill = wynwood.books.create(title: 'A Time To Kill', genre: 'thriller', language: 'english', sales_in_millions: 23.4) 
 timetokill.collaborations.create(author_id: johng.id, role: 'writer')
 
-perhaps = penguin.books.create(title: 'One Day, Perhaps', genre: 'romance', language: 'french') 
+thefirm = wynwood.books.create(title: 'The Firm', genre: 'thriller', language: 'english', sales_in_millions: 123.4) 
+thefirm.collaborations.create(author_id: johng.id, role: 'writer')
+
+perhaps = penguin.books.create(title: 'One Day, Perhaps', genre: 'romance', language: 'french', sales_in_millions: 2.4) 
 perhaps.collaborations.create(author_id: johng.id, role: 'editor')
 perhaps.collaborations.create(author_id: musso.id, role: 'writer')

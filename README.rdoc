@@ -127,3 +127,14 @@ you can use this on scope chain
   Author.alphabetically.thrillers.reverse_order
 
   SELECT "authors".* FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller' ORDER BY first_name DESC
+
+=== from
+  you can change from part of the query
+
+  you want to find the highest grosser in thrillers
+
+  book = Book.thriller.as('thrillers')
+
+  Book.from(book).maximum("thrillers.sales_in_millions") produces below query
+
+  SELECT MAX(thrillers.sales_in_millions) AS max_id FROM (SELECT "books".* FROM "books" WHERE "books"."genre" = 'thriller') thrillers 
