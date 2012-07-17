@@ -63,6 +63,19 @@ it is opposite to above method
 
 scope adds distinct to query
 
+==== uniq(false)
+ if your scope chain as uniq if you want to remove it
+
+ you can call uniq with false
+
+ Book.genres
+
+ SELECT DISTINCT genre FROM "books"
+ 
+ Book.genres.uniq(false)
+
+ SELECT genre FROM "books"
+
 
 ==== merge method
 
@@ -128,6 +141,18 @@ you can use this on scope chain
 
   SELECT "authors".* FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller' ORDER BY first_name DESC
 
+changes order even if you pass string to order
+
+  Book.order("title desc").reverse_order
+
+  SELECT "books".* FROM "books" ORDER BY title ASC
+
+changes order of all the order elements involved in the query
+
+  Book.order(:sales_in_millions).order("title desc").reverse_order
+
+  SELECT "books".* FROM "books" ORDER BY sales_in_millions DESC, title ASC
+
 === from
   you can change from part of the query
 
@@ -138,3 +163,7 @@ you can use this on scope chain
   Book.from(book).maximum("thrillers.sales_in_millions") produces below query
 
   SELECT MAX(thrillers.sales_in_millions) AS max_id FROM (SELECT "books".* FROM "books" WHERE "books"."genre" = 'thriller') thrillers 
+
+  above query can be written as below(we wrote it above manner to demonstrate from)
+
+  Book.thriller.maximum(:sales_in_millions)

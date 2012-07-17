@@ -7,4 +7,8 @@ class Book < ActiveRecord::Base
 
   scope :thriller, lambda { where(genre: 'thriller') }
   scope :highest_grosser, lambda { where(sales_in_millions: maximum(:sales_in_millions)) }
+
+  def self.genres
+    select(:genre).uniq
+  end
 end
