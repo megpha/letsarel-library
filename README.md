@@ -1,3 +1,5 @@
+![Alt text](/ERD.png)
+
 == Welcome to Letsarel
   This is example project used to demonstrate active record arel capabilities
 
