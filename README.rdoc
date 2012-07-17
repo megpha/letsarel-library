@@ -4,14 +4,12 @@
 == Getting Started
   rake db:reset
 
-
-
-
 == Scope Extensions
+
   author = Author.first
 
-
 === merge association proxies
+
   look the author#publishers 
 
   Publisher.joins(books: { collaborations: :author }).merge(author.collaborations.scoped)
@@ -22,97 +20,92 @@
 
 === except
 
-look the author#publishers_worked_as_editor
+  look the author#publishers_worked_as_editor
 
-after the merge with writer
+  after the merge with writer
 
-author.publishers.merge(Author.writer).joins_values
+  author.publishers.merge(Author.writer).joins_values
 
-[{:books=>{:collaborations=>:author}}, :collaborations]
+  [{:books=>{:collaborations=>:author}}, :collaborations]
 
-but Publisher can not join on :collaborations
+  but Publisher can not join on :collaborations
 
-this is due to merge of writer scope
+  this is due to merge of writer scope
 
-execute the above scope
+  execute the above scope
 
   author.publishers.merge(Author.writer).to_a
 
-error
------
+==== error
 
-ActiveRecord::ConfigurationError: Association named 'collaborations' was not found; perhaps you misspelled it?
+  ActiveRecord::ConfigurationError: Association named 'collaborations' was not found; perhaps you misspelled it?
 
+  so to remove that join before the merge you need to do
 
-so to remove that join before the merge you need to do
+  author.publishers.merge(Author.writer.except(:joins)).joins_values
 
-author.publishers.merge(Author.writer.except(:joins)).joins_values
-
-[{:books=>{:collaborations=>:author}}]
+  [{:books=>{:collaborations=>:author}}]
 
 
 ==== except
 
-it is complimentary to above method
+  it is complimentary to above method
 
-author.publishers.merge(Author.writer.only(:wheres))
+  author.publishers.merge(Author.writer.only(:wheres))
 
 ==== uniq on scope vs association proxy
 
-author.books.uniq
+  author.books.uniq
 
-SELECT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
+  SELECT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
 
-author.books.scoped.uniq
+  author.books.scoped.uniq
 
-SELECT DISTINCT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
+  SELECT DISTINCT "books".* FROM "books" INNER JOIN "collaborations" ON "books"."id" = "collaborations"."book_id" WHERE "collaborations"."author_id" = 1
 
-scope add distinct to query
+  scope add distinct to query
 
 
 ==== merge method
 
-you can merge any scope defined on joins/includes models
+  you can merge any scope defined on joins/includes models
 
 
-Publisher.joins(books: { collaborations: :author }).merge(Book.thriller)
+  Publisher.joins(books: { collaborations: :author }).merge(Book.thriller)
 
-Publisher.joins(books: { collaborations: :author }).merge(Collaboration.editor)
+  Publisher.joins(books: { collaborations: :author }).merge(Collaboration.editor)
 
-Publisher.joins(books: { collaborations: :author }).merge(Author.editor.except(:joins))
+  Publisher.joins(books: { collaborations: :author }).merge(Author.editor.except(:joins))
 
 ======= you can chain the merge
 
-Publisher.
-  joins(books: { collaborations: :author }).
-  merge(Author.editor.except(:joins))
-  merge(Book.thriller)
+  Publisher.
+    joins(books: { collaborations: :author }).
+    merge(Author.editor.except(:joins))
+    merge(Book.thriller)
 
 === includes/joins
 
+  Publisher.includes(books: { collaborations: :author }).merge(Collaboration.editor)
 
-Publisher.includes(books: { collaborations: :author }).merge(Collaboration.editor)
+  produces left outer joins
 
-produces left outer joins
+  SELECT "publishers"."id" AS t0_r0, "publishers"."name" AS t0_r1, "publishers"."created_at" AS t0_r2, "publishers"."updated_at" AS t0_r3, "books"."id" AS t1_r0, "books"."title" AS t1_r1, "books"."language" AS t1_r2, "books"."genre" AS t1_r3, "books"."publisher_id" AS t1_r4, "books"."published" AS t1_r5, "books"."created_at" AS t1_r6, "books"."updated_at" AS t1_r7, "collaborations"."id" AS t2_r0, "collaborations"."book_id" AS t2_r1, "collaborations"."author_id" AS t2_r2, "collaborations"."role" AS t2_r3, "collaborations"."created_at" AS t2_r4, "collaborations"."updated_at" AS t2_r5, "authors"."id" AS t3_r0, "authors"."first_name" AS t3_r1, "authors"."last_name" AS t3_r2, "authors"."created_at" AS t3_r3, "authors"."updated_at" AS t3_r4 FROM "publishers" LEFT OUTER JOIN "books" ON "books"."publisher_id" = "publishers"."id" LEFT OUTER JOIN "collaborations" ON "collaborations"."book_id" = "books"."id" LEFT OUTER JOIN "authors" ON "authors"."id" = "collaborations"."author_id" WHERE "collaborations"."role" = 'editor'
 
-SELECT "publishers"."id" AS t0_r0, "publishers"."name" AS t0_r1, "publishers"."created_at" AS t0_r2, "publishers"."updated_at" AS t0_r3, "books"."id" AS t1_r0, "books"."title" AS t1_r1, "books"."language" AS t1_r2, "books"."genre" AS t1_r3, "books"."publisher_id" AS t1_r4, "books"."published" AS t1_r5, "books"."created_at" AS t1_r6, "books"."updated_at" AS t1_r7, "collaborations"."id" AS t2_r0, "collaborations"."book_id" AS t2_r1, "collaborations"."author_id" AS t2_r2, "collaborations"."role" AS t2_r3, "collaborations"."created_at" AS t2_r4, "collaborations"."updated_at" AS t2_r5, "authors"."id" AS t3_r0, "authors"."first_name" AS t3_r1, "authors"."last_name" AS t3_r2, "authors"."created_at" AS t3_r3, "authors"."updated_at" AS t3_r4 FROM "publishers" LEFT OUTER JOIN "books" ON "books"."publisher_id" = "publishers"."id" LEFT OUTER JOIN "collaborations" ON "collaborations"."book_id" = "books"."id" LEFT OUTER JOIN "authors" ON "authors"."id" = "collaborations"."author_id" WHERE "collaborations"."role" = 'editor'
+  Publisher.joins(books: { collaborations: :author }).merge(Collaboration.editor)
 
-Publisher.joins(books: { collaborations: :author }).merge(Collaboration.editor)
+  produces inner joins
 
-produces inner joins
-
-SELECT "publishers".* FROM "publishers" INNER JOIN "books" ON "books"."publisher_id" = "publishers"."id" INNER JOIN "collaborations" ON "collaborations"."book_id" = "books"."id" INNER JOIN "authors" ON "authors"."id" = "collaborations"."author_id" WHERE "collaborations"."role" = 'editor'
+  SELECT "publishers".* FROM "publishers" INNER JOIN "books" ON "books"."publisher_id" = "publishers"."id" INNER JOIN "collaborations" ON "collaborations"."book_id" = "books"."id" INNER JOIN "authors" ON "authors"."id" = "collaborations"."author_id" WHERE "collaborations"."role" = 'editor'
 
 === subquery
 
-Author.non_thriller_writers
+  Author.non_thriller_writers
 
-SELECT "authors".* FROM "authors" WHERE ("authors"."id" NOT IN (SELECT "authors"."id" FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller'))
+  SELECT "authors".* FROM "authors" WHERE ("authors"."id" NOT IN (SELECT "authors"."id" FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller'))
 
 === order
 
-you can arel attribute set order type
+  you can arel attribute set order type
 
-Author.order(Author.arel_table[:first_name].desc)
-
-
+  Author.order(Author.arel_table[:first_name].desc)
