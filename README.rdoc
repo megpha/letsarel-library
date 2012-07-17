@@ -107,3 +107,23 @@ produces inner joins
 you can arel attribute set order type
 
   Author.order(Author.arel_table[:first_name].desc)
+
+=== reverse_order
+
+you can change the order scope
+
+  Author.alphabetically
+
+  SELECT "authors".* FROM "authors" ORDER BY first_name
+
+if you want to order them desc of first_name you can use reverse_order
+
+  Author.alphabetically.reverse_order
+
+  SELECT "authors".* FROM "authors" ORDER BY first_name DESC
+
+you can use this on scope chain
+
+  Author.alphabetically.thrillers.reverse_order
+
+  SELECT "authors".* FROM "authors" INNER JOIN "collaborations" ON "collaborations"."author_id" = "authors"."id" INNER JOIN "books" ON "books"."id" = "collaborations"."book_id" WHERE "books"."genre" = 'thriller' ORDER BY first_name DESC

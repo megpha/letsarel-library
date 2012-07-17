@@ -9,6 +9,8 @@ class Author < ActiveRecord::Base
 
   scope :thrillers, lambda { joins(collaborations: :book).merge(Book.thriller) }
 
+  scope :alphabetically, lambda { order(:first_name) }
+
   # or query
   def self.by_name(name)
     name = "%#{ name }%"
