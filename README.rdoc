@@ -43,9 +43,9 @@ so to remove that join before the merge you need to do
   [{:books=>{:collaborations=>:author}}]
 
 
-==== except
+==== only
 
-it is complimentary to above method
+it is opposite to above method
 
   author.publishers.merge(Author.writer.only(:wheres))
 
